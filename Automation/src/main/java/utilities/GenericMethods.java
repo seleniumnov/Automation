@@ -134,7 +134,7 @@ public class GenericMethods extends GlobalConstants {
 			click(home.getSignIn(), "Sign In");
 			input(home.getUserName(), testData.get("EmailID"), "Email Address");
 			input(home.getPassWord(), testData.get("Password"), "Password");
-			click(home.getLogOn(), "Submit Login");
+			click(home.getLogOn(), "Login");
 		} catch (Exception e) {
 			Assert.fail("Fail to Login due to "+e.getMessage());
 		}
@@ -149,7 +149,7 @@ public class GenericMethods extends GlobalConstants {
 			System.setProperty(GlobalConstants.firefox, GlobalConstants.firefoxPath);
 
 			driver = new FirefoxDriver();
-			logger.log(Status.INFO, "Firefox has been successfully Launched");
+			//logger.log(Status.INFO, "Firefox has been successfully Launched");
 
 		} else if (browserName.equalsIgnoreCase("Chrome")) {
 			ChromeOptions options = new ChromeOptions();
@@ -157,12 +157,12 @@ public class GenericMethods extends GlobalConstants {
 			options.addArguments("--disable-notifications");
 			System.setProperty(GlobalConstants.chrome, GlobalConstants.chromePath);
 			driver = new ChromeDriver(options);
-			logger.log(Status.INFO, "Chrome has been successfully Launched");
+			//logger.log(Status.INFO, "Chrome has been successfully Launched");
 		} else if (browserName.equalsIgnoreCase("ie")) {
 			System.setProperty(GlobalConstants.ie, GlobalConstants.iePath);
 			driver = new InternetExplorerDriver();
 		} else {
-			System.out.println("No Browser has been selected");
+			Assert.fail("No Browser has been selected");
 		}
 	}
 
