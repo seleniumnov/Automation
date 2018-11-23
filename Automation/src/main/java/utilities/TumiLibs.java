@@ -1,20 +1,27 @@
 package utilities;
 
 import org.openqa.selenium.support.PageFactory;
-import webpages.HomePage;
+
+import pageObjects.HomePage;
 
 public class TumiLibs extends GenericMethods {
 	
-	public static void closeSignUp() {
-		
-		HomePage home = PageFactory.initElements(driver, HomePage.class);
-		click(home.getSignupPopup(), "SignUp");
+	public static void closeSignUp() {		
+		try {
+			HomePage home = PageFactory.initElements(driver, HomePage.class);
+			click(home.getSignupPopup(), "SignUp");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void acceptCookies() {
-		
-		HomePage home = PageFactory.initElements(driver, HomePage.class);
-		click(home.getAcceptCookies(), "Accept Cookies");
+		try {
+			HomePage home = PageFactory.initElements(driver, HomePage.class);
+			domClick(home.getAcceptCookies(), "Accept Cookies");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

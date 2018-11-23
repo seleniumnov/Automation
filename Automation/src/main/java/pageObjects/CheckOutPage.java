@@ -1,4 +1,4 @@
-package webpages;
+package pageObjects;
 
 public class CheckOutPage {
 

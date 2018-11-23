@@ -90,12 +90,12 @@ public class ReadTestData {
 		return objTestData;
 	}
 
-	public static Map<String, String> retrieveData(String sheetName, String testCase_Name) {
+	public static Map<String, String> retrieveData(String sheetName, String testCaseName) {
 
 		Map<String, Map<String, String>> testData = null;
 
 		try {
-			testData = readTestData(GlobalConstants.excelPath, sheetName, testCase_Name);
+			testData = readTestData(GlobalConstants.excelPath, sheetName, testCaseName);
 
 		} catch (Exception e) {
 
@@ -108,7 +108,7 @@ public class ReadTestData {
 
 			entry = (Entry<String, Map<String, String>>) entries.next();
 			values = (Map<String, String>) entry.getValue();
-			System.out.println(values);
+			//System.out.println(values);
 		}
 		return values;
 	}

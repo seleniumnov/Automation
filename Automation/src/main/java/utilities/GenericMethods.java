@@ -2,13 +2,26 @@ package utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -16,6 +29,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.io.FileHandler;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,17 +38,23 @@ import org.testng.ITestResult;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
+
 import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
+
+import dataProvider.ReadTestData;
+import pageObjects.HomePage;
 
 
 
 public class GenericMethods extends GlobalConstants {
 
 	public static String browser = null;
-	public static Properties prop = null;
+	public Properties prop = null;
+	public static HomePage home = null;
 
 	@BeforeClass(alwaysRun = true)
 	public static void launchBrowser() {
@@ -44,8 +64,9 @@ public class GenericMethods extends GlobalConstants {
 			driver.get(url);
 			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			TumiLibs.closeSignUp();
+			TumiLibs.acceptCookies();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Assert.fail("Faile to launch Application "+e.getMessage());
 		}
 	}
 
@@ -58,9 +79,16 @@ public class GenericMethods extends GlobalConstants {
 			e.printStackTrace();
 		}
 	}
+	
+	@BeforeMethod(alwaysRun = true)
+	public static void initiatePageObjects(Method name) {
+		
+		logger = report.createTest(name.getName());
+		home = new HomePage(driver);
+	}
 
 	@AfterMethod(alwaysRun = true)
-	public void tearDown(ITestResult result) {
+	public void verifyTestResult(ITestResult result) {
 
 		try {
 			if (result.getStatus() == ITestResult.SUCCESS) {
@@ -100,18 +128,16 @@ public class GenericMethods extends GlobalConstants {
 
 	}
 
-	public static void Login() throws Exception {
-
+	public static void login(String sheetName,String testCaseName){
 		try {
-			//Map<String, String> testData = ReadTestData.retrieveData("User_Login", "Login");
-			//click(userData.getLoginButton(), "Login");
-			//input(userData.getUserName(), testData.get("UserName"), "User");
-			//input(userData.getPassWord(), testData.get("Password"), "Password");
-			//click(userData.getSubmit(), "Submit Login");
+			Map<String, String> testData = ReadTestData.retrieveData(sheetName, testCaseName);
+			click(home.getSignIn(), "Sign In");
+			input(home.getUserName(), testData.get("EmailID"), "Email Address");
+			input(home.getPassWord(), testData.get("Password"), "Password");
+			click(home.getLogOn(), "Submit Login");
 		} catch (Exception e) {
 			Assert.fail("Fail to Login due to "+e.getMessage());
 		}
-
 	}
 
 	public static void getBrowser(String browserName) throws Exception {
@@ -138,7 +164,6 @@ public class GenericMethods extends GlobalConstants {
 		} else {
 			System.out.println("No Browser has been selected");
 		}
-
 	}
 
 	public static void getURL(String URL) {
@@ -361,9 +386,8 @@ public class GenericMethods extends GlobalConstants {
 	}
 	
 	public void scrollUp() {
-
 		JavascriptExecutor jse = (JavascriptExecutor) driver;
-		jse.executeScript("window.scrollBy(2000,0)", "");
+		jse.executeScript("window.scrollBy(250,0)", "");
 		WaitForJStoLoad();
 	}
 	
@@ -388,16 +412,18 @@ public class GenericMethods extends GlobalConstants {
 	}
 	
 	
-	public Properties getRepository() {
+	public  String repository(String propertyName) {
+		prop = new Properties();
 		try {
-			String propPath = "";
+			String propPath = propertiesPath;
 			File file = new File(propPath);
 			FileInputStream fin = new FileInputStream(file);
 			prop.load(fin);
+			
 		} catch (Exception e) {
 			Assert.fail("Unable to Load Properties "+e.getMessage());
 		}
-		return prop;
+		return prop.getProperty(propertyName);
 	}
 
 	public static void maximizeBrowser() {
@@ -435,5 +461,211 @@ public class GenericMethods extends GlobalConstants {
 			Assert.fail("Unable to Kill the Session");
 		}
 	}
+	
+	public static void acceptAlert() {
+		try {
+			driver.switchTo().alert().accept();
+		} catch (Exception e) {
+			logger.log(Status.FAIL, "No Alert Present in this window");
+		}
+	}
+	
+	public static void verifyAssertEquals(String actual,String expected) {
+		try {
+			Assert.assertEquals(actual, expected);
+		} catch (Exception e) {
+			logger.log(Status.FAIL, e.getMessage());
+		}
+	}
+	
+	public static void verifyAssertContains(String actual,String text,String errorMsg) {
+		try {
+			Assert.assertEquals(actual.contains(text),errorMsg);
+		} catch (Exception e) {
+			logger.log(Status.FAIL, e.getMessage());
+		}
+	}
+	
+	public static void executeAutoITFile(String path) {
+		try {
+			Runtime.getRuntime().exec(path);
+		} catch (Exception e) {
+			Assert.fail("Fail to Execute .exe file "+e.getMessage());
+		}
+	}
+	
+	public static String getFirstSelectedOption(WebElement ele) {
+		String option = null;
+		try {
+			option = new Select(ele).getFirstSelectedOption().getText();
+		} catch (Exception e) {
+			Assert.fail("Unable to Fetch First Selected Option due to "+e.getMessage());
+		}
+		return option;
+	}
+	
+	public static void keyEnter(WebElement ele) {
+		ele.sendKeys(Keys.ENTER);
+	}
+	
+	public static void keyTab(WebElement ele) {
+		ele.sendKeys(Keys.TAB);
+	}
+	
+	/**
+	 * Desc : Provide a Delay while the Browser is loaded.
+	 * @param time
+	 */
+	public static void waitForLoad(int time) {
+		boolean status = false;
+		Calendar startTime = Calendar.getInstance();
+		Calendar endTime = Calendar.getInstance();
+		long timeTaken;
+	    ExpectedCondition<Boolean> pageLoadCondition = new
+	        ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver input) {
+					return ((JavascriptExecutor)driver).executeScript("return document.readyState").equals("complete");
+				}
+	        };
+	    WebDriverWait wait = new WebDriverWait(driver, time);
+	    do {
+	    	
+			try {
+				wait.until(pageLoadCondition);
+				if(wait.until(pageLoadCondition)==true){	
+					status = true;
+				}else{
+					status = false;
+				}
+				} catch (NoSuchElementException e) {
+					status = false;
+				}
+				endTime = Calendar.getInstance();
+				timeTaken = (endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
+				if (timeTaken > time){
+					timeTaken = timeTaken-time;	
+					startTime = Calendar.getInstance();
+				}
+		} while(status == false && timeTaken <= time);		   		   
+	}
+	
+	/**
+	 * Desc :Provide a Delay till the page Javascript is loaded.
+	 * @param locater
+	 * @param timeOut
+	 * @return 
+	 * @throws InterruptedException
+	 */
+	public static long  waitForJavaScriptLoad(WebElement locater, int timeOut) throws InterruptedException {
+		boolean status = false;
+		Calendar startTime = Calendar.getInstance();
+		Calendar endTime = Calendar.getInstance();
+		long timeTaken;
+		do {
+			try {
+				if(locater.getText().equals("")){
+					status = true;
+				}else{
+					status = false;
+				}				
+			} catch (NoSuchElementException e) {
+				status = false;
+			}
+			endTime = Calendar.getInstance();
+			timeTaken = (endTime.getTimeInMillis() - startTime
+					.getTimeInMillis()) / 1000;
+
+		} while (status == false && timeTaken <= timeOut);
+		System.out.println("Time taken for Loading is "+timeTaken);			
+		if (timeTaken > timeOut) {
+			System.out.println("timeTaken > timeOut  case");
+			Thread.sleep(30000);
+		}
+		return timeTaken;
+	}
+	
+	/**
+	 * Desc: Provide a wait Till the Page got updated with Javascripts
+	 * @param timeOut
+	 * @throws InterruptedException
+	 */
+	@SuppressWarnings("unlikely-arg-type")
+	public static void waitUnitlrocDetailsLoad(int timeOut) throws InterruptedException {
+		boolean status = false;
+		Calendar startTime = Calendar.getInstance();
+		Calendar endTime = Calendar.getInstance();
+		long timeTaken;
+		do {
+			try {
+				String string = "loading";
+				if(!driver.findElement(By.tagName("title")).equals(string)){
+					status = true;
+				}else{
+					status = false;
+				}				
+			} catch (NoSuchElementException e) {
+				status = false;
+			}
+			endTime = Calendar.getInstance();
+			timeTaken = (endTime.getTimeInMillis() - startTime
+					.getTimeInMillis()) / 1000;
+
+		} while (status == false && timeTaken <= timeOut);
+		System.out.println("Time taken for Tags got Loading is "+timeTaken);			
+		if (timeTaken > timeOut) {
+			System.out.println("timeTaken > timeOut  case");
+			Thread.sleep(30000);
+		}	
+	}
+	/**
+	 * Desc: Get All the Links and Images and Verify whether they are broken or not
+	 * @throws IOException
+	 */
+	public void verifyBrokenLinksAndImages(){
+		
+        List <WebElement> totalLinksAndImages = driver.findElements(By.tagName("a"));
+        totalLinksAndImages.addAll(driver.findElements(By.tagName("img")));
+        
+        System.out.println("total number of links and images are ----->" + totalLinksAndImages.size());
+
+        List <String> activeLinks = new ArrayList<String>();
+
+        for(int i = 0; i < totalLinksAndImages.size(); i++){
+            if(totalLinksAndImages.get(i).getAttribute("href") != null){
+                activeLinks.add(totalLinksAndImages.get(i).getAttribute("href"));
+            }
+        }
+        System.out.println("total number of active links are ----->" + activeLinks.size());
+
+        int count = 1;
+        for(int j = 0; j < activeLinks.size(); j++){
+            String url = activeLinks.get(j);
+            try {
+                HttpURLConnection connection = (HttpURLConnection)new URL(activeLinks.get(j)).openConnection();
+                connection.connect();
+                String massage = connection.getResponseMessage();
+                connection.disconnect();
+                System.out.println(count + "--->" + url + "----->" + massage);
+                count++;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+	/**
+	 * Desc: Delete All Cookies
+	 */
+	public void deleteAllCookies(){
+        driver.manage().deleteAllCookies();
+    }
+	
+	public void delay(int mili){
+        try {
+            Thread.sleep(mili);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

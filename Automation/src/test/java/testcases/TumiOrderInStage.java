@@ -5,9 +5,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.annotations.Test;
 
+import pageObjects.MiniCartPage;
+import pageObjects.ShippingPage;
 import utilities.GenericMethods;
-import webpages.MiniCartPage;
-import webpages.ShippingPage;
 
 public class TumiOrderInStage extends GenericMethods {
 	private String baseUrl;
@@ -16,8 +16,6 @@ public class TumiOrderInStage extends GenericMethods {
 	
 	@Test
 	public void testTumiLogin() throws InterruptedException{
-		
-		logger = report.createTest("Tumi");
 		
 		MiniCartPage cart = PageFactory.initElements(driver, MiniCartPage.class);
 		ShippingPage shipping = PageFactory.initElements(driver, ShippingPage.class);
