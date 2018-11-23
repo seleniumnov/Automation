@@ -9,7 +9,7 @@ public class TumiLibs extends GenericMethods {
 	public static void closeSignUp() {		
 		try {
 			HomePage home = PageFactory.initElements(driver, HomePage.class);
-			click(home.getSignupPopup(), "SignUp");
+			click(home.getSignupPopup(), "Close SignUp Window");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

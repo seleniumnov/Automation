@@ -18,11 +18,8 @@ public class GlobalConstants extends Reports {
 	public static String chrome 	= "webdriver.chrome.driver";
 	public static String firefox 	= "webdriver.gecko.driver";
 	public static String ie 		= "webdriver.ie.driver";
-	
-	// Excel Data Path
-	
-	public static String excelPath = "./TestData/Tumi.xlsx";
-	
+
+	public static String excelPath = "./TestData/Tumi.xlsx";	
 	public static String propertiesPath = "./Validations/FlagMessages.properties"; 
 
 }
