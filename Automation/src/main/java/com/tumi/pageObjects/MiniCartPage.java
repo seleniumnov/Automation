@@ -1,4 +1,4 @@
-package pageObjects;
+package com.tumi.pageObjects;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;

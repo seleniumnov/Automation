@@ -1,8 +1,8 @@
-package utilities;
+package com.tumi.utilities;
 
 import org.openqa.selenium.support.PageFactory;
 
-import pageObjects.HomePage;
+import com.tumi.pageObjects.HomePage;
 
 public class TumiLibs extends GenericMethods {
 	

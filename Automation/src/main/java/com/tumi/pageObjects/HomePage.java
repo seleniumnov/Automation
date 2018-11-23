@@ -1,4 +1,4 @@
-package pageObjects;
+package com.tumi.pageObjects;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -6,8 +6,8 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
 
-import reports.Reports;
-import utilities.GenericMethods;
+import com.tumi.reports.Reports;
+import com.tumi.utilities.GenericMethods;
 
 public class HomePage extends GenericMethods {
 	

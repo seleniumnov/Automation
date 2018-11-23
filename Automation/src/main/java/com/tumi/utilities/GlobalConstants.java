@@ -1,7 +1,7 @@
-package utilities;
+package com.tumi.utilities;
 
 
-import reports.Reports;
+import com.tumi.reports.Reports;
 
 public class GlobalConstants extends Reports {
 	//initiating driver

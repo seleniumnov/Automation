@@ -1,4 +1,4 @@
-package utilities;
+package com.tumi.utilities;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,9 +44,8 @@ import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
-
-import dataProvider.ReadTestData;
-import pageObjects.HomePage;
+import com.tumi.dataProvider.ReadTestData;
+import com.tumi.pageObjects.HomePage;
 
 
 

@@ -1,13 +1,13 @@
-package testcases;
+package com.tumi.demotestcases;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.annotations.Test;
 
-import pageObjects.MiniCartPage;
-import pageObjects.ShippingPage;
-import utilities.GenericMethods;
+import com.tumi.pageObjects.MiniCartPage;
+import com.tumi.pageObjects.ShippingPage;
+import com.tumi.utilities.GenericMethods;
 
 public class TumiOrderInStage extends GenericMethods {
 	private String baseUrl;

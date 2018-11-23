@@ -1,4 +1,4 @@
-package reports;
+package com.tumi.reports;
 
 import java.io.File;
 import java.text.SimpleDateFormat;

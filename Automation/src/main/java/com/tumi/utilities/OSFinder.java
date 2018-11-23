@@ -1,4 +1,4 @@
-package utilities;
+package com.tumi.utilities;
 
 public class OSFinder {
 
